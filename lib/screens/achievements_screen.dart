@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
+import '../widgets/liquid_glass_widgets.dart';
 
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({Key? key}) : super(key: key);
@@ -35,7 +36,10 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
       backgroundColor: const Color(0xFF0A0E27),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1F3A),
-        title: const Text('Achievements'),
+        title: const Text(
+          'Achievements',
+          style: TextStyle(fontSize: 16),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -59,16 +63,18 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   Widget _buildProgressHeader(int unlocked, int total) {
     final percentage = (unlocked / total * 100).toInt();
 
-    return Container(
+    return LiquidGlassCard(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF00FF88).withOpacity(0.3),
-          width: 2,
-        ),
+      borderRadius: 16,
+      opacity: 0.15,
+      gradientColors: [
+        const Color(0xFF00FF88).withOpacity(0.2),
+        Colors.white.withOpacity(0.1),
+      ],
+      border: Border.all(
+        color: const Color(0xFF00FF88).withOpacity(0.5),
+        width: 2,
       ),
       child: Column(
         children: [
@@ -79,7 +85,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 'Progress',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -87,7 +93,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 '$unlocked / $total',
                 style: const TextStyle(
                   color: Color(0xFF00FF88),
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -110,7 +116,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
             '$percentage% Complete',
             style: const TextStyle(
               color: Colors.white70,
-              fontSize: 14,
+              fontSize: 10,
             ),
           ),
         ],
@@ -119,18 +125,22 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   }
 
   Widget _buildAchievementCard(Achievement achievement) {
-    return Container(
+    return LiquidGlassCard(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: achievement.unlocked
-              ? const Color(0xFFFFBE0B).withOpacity(0.5)
-              : Colors.transparent,
-          width: 2,
-        ),
+      borderRadius: 16,
+      opacity: 0.15,
+      gradientColors: [
+        achievement.unlocked
+            ? const Color(0xFFFFBE0B).withOpacity(0.2)
+            : Colors.white.withOpacity(0.1),
+        Colors.white.withOpacity(0.05),
+      ],
+      border: Border.all(
+        color: achievement.unlocked
+            ? const Color(0xFFFFBE0B).withOpacity(0.5)
+            : Colors.white.withOpacity(0.1),
+        width: 2,
       ),
       child: Row(
         children: [
@@ -161,7 +171,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                   style: TextStyle(
                     color:
                         achievement.unlocked ? Colors.white : Colors.white54,
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -171,7 +181,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                   style: TextStyle(
                     color:
                         achievement.unlocked ? Colors.white70 : Colors.white38,
-                    fontSize: 14,
+                    fontSize: 10,
                   ),
                 ),
                 if (achievement.unlocked && achievement.unlockedAt != null)
@@ -182,14 +192,14 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                         const Icon(
                           Icons.check_circle,
                           color: Color(0xFF00FF88),
-                          size: 16,
+                          size: 14,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           'Unlocked ${_formatDate(achievement.unlockedAt!)}',
                           style: const TextStyle(
                             color: Color(0xFF00FF88),
-                            fontSize: 12,
+                            fontSize: 10,
                           ),
                         ),
                       ],
@@ -210,7 +220,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                   Icon(
                     Icons.diamond,
                     color: Color(0xFF00D4FF),
-                    size: 16,
+                    size: 14,
                   ),
                   SizedBox(width: 4),
                   Text(
@@ -218,6 +228,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                     style: TextStyle(
                       color: Color(0xFF00D4FF),
                       fontWeight: FontWeight.bold,
+                      fontSize: 11,
                     ),
                   ),
                 ],

@@ -7,6 +7,7 @@ import '../services/database_service.dart';
 import '../services/achievement_service.dart';
 import '../services/daily_challenge_service.dart';
 import '../widgets/game_board.dart';
+import '../widgets/liquid_glass_widgets.dart';
 
 class GameScreen extends StatefulWidget {
   final Level level;
@@ -80,11 +81,19 @@ class _GameScreenState extends State<GameScreen> {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+          LiquidGlassContainer(
+            width: 40,
+            height: 40,
+            borderRadius: 10,
+            padding: const EdgeInsets.all(0),
+            opacity: 0.2,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              onPressed: () => Navigator.pop(context),
+              padding: EdgeInsets.zero,
+            ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +102,7 @@ class _GameScreenState extends State<GameScreen> {
                   widget.level.name,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -101,7 +110,7 @@ class _GameScreenState extends State<GameScreen> {
                   'Level ${widget.level.levelNumber}',
                   style: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 14,
+                    fontSize: 11,
                   ),
                 ),
               ],
@@ -114,24 +123,29 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildStatsPanel(GameState state) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return LiquidGlassContainer(
+      height: 50,
+      width: 200,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      borderRadius: 12,
+      opacity: 0.15,
+      gradientColors: [
+        const Color(0xFF00D4FF).withOpacity(0.2),
+        Colors.white.withOpacity(0.1),
+      ],
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildStatItem(
             Icons.access_time,
             _formatTime(state.elapsedSeconds),
           ),
-          const SizedBox(width: 16),
+          Container(width: 1, height: 24, color: Colors.white24),
           _buildStatItem(
             Icons.sync,
             '${state.rotationCount}',
           ),
-          const SizedBox(width: 16),
+          Container(width: 1, height: 24, color: Colors.white24),
           _buildProgressIndicator(state),
         ],
       ),
@@ -140,14 +154,15 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildStatItem(IconData icon, String value) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: const Color(0xFF00D4FF), size: 20),
-        const SizedBox(width: 4),
+        Icon(icon, color: const Color(0xFF00D4FF), size: 16),
+        const SizedBox(width: 3),
         Text(
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -160,6 +175,7 @@ class _GameScreenState extends State<GameScreen> {
     final activatedCount = state.activatedTargets.length;
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           activatedCount == totalTargets
@@ -168,14 +184,14 @@ class _GameScreenState extends State<GameScreen> {
           color: activatedCount == totalTargets
               ? const Color(0xFF00FF88)
               : Colors.white54,
-          size: 20,
+          size: 16,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 3),
         Text(
           '$activatedCount/$totalTargets',
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -227,24 +243,26 @@ class _GameScreenState extends State<GameScreen> {
   }) {
     return Opacity(
       opacity: onPressed == null ? 0.5 : 1.0,
-      child: ElevatedButton(
+      child: LiquidGlassButton(
+        width: 100,
+        height: 70,
+        borderRadius: 14,
+        primaryColor: color,
+        useNeonEffect: true,
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 24),
+            Icon(icon, size: 24, color: Colors.white),
             const SizedBox(height: 4),
             Text(
               cooldown != null && cooldown > 0 ? '$cooldown s' : label,
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -293,12 +311,21 @@ class _GameScreenState extends State<GameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF1A1F3A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Padding(
+        backgroundColor: Colors.transparent,
+        child: LiquidGlassContainer(
+          width: 340,
+          height: 420,
           padding: const EdgeInsets.all(32),
+          borderRadius: 24,
+          opacity: 0.2,
+          gradientColors: [
+            const Color(0xFFFFBE0B).withOpacity(0.2),
+            Colors.white.withOpacity(0.1),
+          ],
+          border: Border.all(
+            color: const Color(0xFFFFBE0B).withOpacity(0.4),
+            width: 2,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -310,15 +337,31 @@ class _GameScreenState extends State<GameScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   3,
-                  (index) => Icon(
-                    index < stars ? Icons.star : Icons.star_border,
-                    color: const Color(0xFFFFBE0B),
-                    size: 48,
+                  (index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: index < stars
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFFFFBE0B).withOpacity(0.6),
+                                  blurRadius: 15,
+                                  spreadRadius: 3,
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Icon(
+                        index < stars ? Icons.star : Icons.star_border,
+                        color: const Color(0xFFFFBE0B),
+                        size: 48,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -328,41 +371,46 @@ class _GameScreenState extends State<GameScreen> {
               _buildStatRow('Rotations', '${state.rotationCount}'),
               const SizedBox(height: 8),
               _buildStatRow('Crystals', '+${stars * 10}'),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
+                    child: LiquidGlassButton(
+                      height: 50,
+                      primaryColor: const Color(0xFF666666),
+                      useNeonEffect: false,
                       onPressed: () {
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF666666),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      child: const Text(
+                        'Menu',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      child: const Text('Menu'),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
+                    child: LiquidGlassButton(
+                      height: 50,
+                      primaryColor: const Color(0xFF00D4FF),
                       onPressed: () {
                         Navigator.pop(context);
                         _controller.resetLevel();
                         _controller.startLevel();
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00D4FF),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      child: const Text(
+                        'Retry',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      child: const Text('Retry'),
                     ),
                   ),
                 ],
