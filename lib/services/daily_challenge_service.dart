@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:convert';
 import '../models/level.dart';
 import '../models/game_element.dart';
 import 'database_service.dart';
@@ -19,9 +20,13 @@ class DailyChallengeService {
     final existingChallenge =
         await DatabaseService.getDailyChallenge(dateString);
 
-    if (existingChallenge != null) {
-      // Return cached challenge
-      return Level.fromJson(existingChallenge);
+    if (existingChallenge != null && existingChallenge['levelData'] != null) {
+      // Parse levelData from JSON string
+      final levelData = existingChallenge['levelData'] as String;
+      if (levelData.isNotEmpty) {
+        final levelJson = jsonDecode(levelData) as Map<String, dynamic>;
+        return Level.fromJson(levelJson);
+      }
     }
 
     // Generate new challenge
@@ -30,7 +35,7 @@ class DailyChallengeService {
     // Save to database
     await DatabaseService.saveDailyChallenge(
       date: dateString,
-      levelData: level.toJson().toString(),
+      levelData: jsonEncode(level.toJson()),
       completed: false,
     );
 

@@ -5,6 +5,7 @@ import '../models/level.dart';
 import '../services/game_controller.dart';
 import '../services/database_service.dart';
 import '../services/achievement_service.dart';
+import '../services/daily_challenge_service.dart';
 import '../widgets/game_board.dart';
 
 class GameScreen extends StatefulWidget {
@@ -259,6 +260,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void _showWinDialog(BuildContext context, GameState state) {
     final stars = state.stars;
+    final isDailyChallenge = widget.level.id.startsWith('daily_');
 
     // Check achievements
     AchievementService.checkAchievements(
@@ -266,18 +268,26 @@ class _GameScreenState extends State<GameScreen> {
       level: widget.level,
     );
 
-    // Save progress
-    DatabaseService.saveProgress(PlayerProgress(
-      levelId: widget.level.id,
-      stars: stars,
-      bestRotations: state.rotationCount,
-      bestTime: state.elapsedSeconds,
-      completed: true,
-      bestReplay: state.moveHistory,
-    ));
+    if (isDailyChallenge) {
+      // Save daily challenge completion
+      DailyChallengeService.completeChallenge(
+        stars: stars,
+        score: stars * 1000 - state.rotationCount * 10 - state.elapsedSeconds,
+      );
+    } else {
+      // Save normal progress
+      DatabaseService.saveProgress(PlayerProgress(
+        levelId: widget.level.id,
+        stars: stars,
+        bestRotations: state.rotationCount,
+        bestTime: state.elapsedSeconds,
+        completed: true,
+        bestReplay: state.moveHistory,
+      ));
 
-    // Award crystals based on stars
-    DatabaseService.addCrystals(stars * 10);
+      // Award crystals based on stars
+      DatabaseService.addCrystals(stars * 10);
+    }
 
     showDialog(
       context: context,

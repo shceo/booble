@@ -374,6 +374,35 @@ class DatabaseService {
     return results.first;
   }
 
+  // Reset all game data
+  static Future<void> resetAllData() async {
+    final db = await database;
+
+    // Clear all tables
+    await db.delete('progress');
+    await db.delete('achievements');
+    await db.delete('daily_challenge');
+
+    // Reset inventory to default
+    await db.update(
+      'inventory',
+      {
+        'crystals': 100,
+        'trajectoryCharges': 3,
+        'purchasedSkins': jsonEncode([]),
+        'purchasedLevelPacks': jsonEncode([]),
+      },
+      where: 'id = ?',
+      whereArgs: [1],
+    );
+
+    // Reinitialize achievements
+    final achievements = _getDefaultAchievements();
+    for (final achievement in achievements) {
+      await db.insert('achievements', achievement.toJson());
+    }
+  }
+
   static Future<void> close() async {
     final db = await database;
     await db.close();
