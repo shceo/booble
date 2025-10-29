@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
+import '../services/daily_challenge_service.dart';
 import 'level_select_screen.dart';
 import 'shop_screen.dart';
 import 'achievements_screen.dart';
+import 'settings_screen.dart';
+import 'game_screen.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({Key? key}) : super(key: key);
@@ -90,14 +93,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                         icon: Icons.calendar_today,
                         label: 'Daily Challenge',
                         color: const Color(0xFFAA00FF),
-                        onPressed: () {
-                          // TODO: Implement daily challenge
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Daily Challenge coming soon!'),
-                            ),
-                          );
-                        },
+                        onPressed: () => _handleDailyChallengePressed(),
                       ),
                       const SizedBox(height: 16),
                       _buildMenuButton(
@@ -142,8 +138,26 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          // Settings icon
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF666666),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.settings, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                ).then((_) => _loadStats());
+              },
+            ),
+          ),
+          const Spacer(),
           _buildStatBadge(
             icon: Icons.star,
             value: '$_totalStars',
@@ -252,6 +266,96 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleDailyChallengePressed() async {
+    // Check if today's challenge is already completed
+    final isCompleted = await DailyChallengeService.isTodayChallengeCompleted();
+
+    if (!mounted) return;
+
+    if (isCompleted) {
+      // Show modal that today's challenge is already completed
+      _showChallengeCompletedModal();
+    } else {
+      // Get today's challenge and navigate to game
+      final level = await DailyChallengeService.getTodayChallenge();
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GameScreen(level: level),
+        ),
+      ).then((_) => _loadStats());
+    }
+  }
+
+  void _showChallengeCompletedModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF1A1F3A),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF00FF88),
+                size: 64,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Challenge Complete!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Today\'s challenge has been completed. Come back tomorrow for a new challenge!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00D4FF),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
