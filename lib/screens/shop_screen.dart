@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
+import '../widgets/liquid_glass_widgets.dart';
 
 class ShopItem {
   final String id;
@@ -122,7 +123,10 @@ class _ShopScreenState extends State<ShopScreen> {
       backgroundColor: const Color(0xFF0A0E27),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1F3A),
-        title: const Text('Shop'),
+        title: const Text(
+          'Shop',
+          style: TextStyle(fontSize: 16),
+        ),
         actions: [
           if (_inventory != null)
             Padding(
@@ -167,107 +171,105 @@ class _ShopScreenState extends State<ShopScreen> {
     final isPurchased = _isPurchased(item);
     final canAfford = _inventory!.crystals >= item.price;
 
-    return Container(
+    return LiquidGlassCard(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isPurchased
-              ? const Color(0xFF00FF88)
-              : item.color.withOpacity(0.3),
-          width: 2,
-        ),
+      padding: const EdgeInsets.all(16),
+      borderRadius: 16,
+      opacity: 0.15,
+      gradientColors: [
+        item.color.withOpacity(0.2),
+        Colors.white.withOpacity(0.1),
+      ],
+      border: Border.all(
+        color: isPurchased
+            ? const Color(0xFF00FF88).withOpacity(0.5)
+            : item.color.withOpacity(0.3),
+        width: 2,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: item.color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                item.icon,
-                color: item.color,
-                size: 32,
-              ),
+      child: Row(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: item.color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+            child: Icon(
+              item.icon,
+              color: item.color,
+              size: 32,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 4),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item.description,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          if (isPurchased)
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00FF88).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                'OWNED',
+                style: TextStyle(
+                  color: Color(0xFF00FF88),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            )
+          else
+            LiquidGlassButton(
+              width: 80,
+              height: 40,
+              borderRadius: 8,
+              primaryColor: item.color,
+              useNeonEffect: true,
+              onPressed: canAfford ? () => _purchaseItem(item) : null,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.diamond, size: 14, color: Colors.white),
+                  const SizedBox(width: 4),
                   Text(
-                    item.description,
+                    '${item.price}',
                     style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: Colors.white,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
-            if (isPurchased)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00FF88).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'OWNED',
-                  style: TextStyle(
-                    color: Color(0xFF00FF88),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-            else
-              ElevatedButton(
-                onPressed: canAfford ? () => _purchaseItem(item) : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: item.color,
-                  disabledBackgroundColor: Colors.grey,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.diamond, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${item.price}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

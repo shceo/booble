@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/level.dart';
 import '../services/database_service.dart';
 import '../utils/level_data.dart';
+import '../widgets/liquid_glass_widgets.dart';
 import 'game_screen.dart';
 
 enum GameMode {
@@ -53,19 +54,23 @@ class _LevelSelectScreenState extends State<LevelSelectScreen>
       backgroundColor: const Color(0xFF0A0E27),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1F3A),
-        title: Text(_getModeTitle()),
+        title: Text(
+          _getModeTitle(),
+          style: const TextStyle(fontSize: 16),
+        ),
         bottom: widget.mode == GameMode.campaign
             ? TabBar(
                 controller: _tabController,
                 isScrollable: true,
                 indicatorColor: const Color(0xFF00D4FF),
+                labelStyle: const TextStyle(fontSize: 13),
                 tabs: List.generate(
                   LevelData.getTotalChapters(),
                   (index) => Tab(
                     child: Row(
                       children: [
-                        Icon(_getChapterIcon(index + 1)),
-                        const SizedBox(width: 8),
+                        Icon(_getChapterIcon(index + 1), size: 20),
+                        const SizedBox(width: 6),
                         Text('Chapter ${index + 1}'),
                       ],
                     ),
@@ -152,6 +157,8 @@ class _LevelSelectScreenState extends State<LevelSelectScreen>
   }
 
   Widget _buildLevelCard(Level level, PlayerProgress? progress, bool isLocked) {
+    final borderColor = _getLevelBorderColor(progress);
+
     return GestureDetector(
       onTap: isLocked
           ? null
@@ -165,15 +172,12 @@ class _LevelSelectScreenState extends State<LevelSelectScreen>
             },
       child: Opacity(
         opacity: isLocked ? 0.4 : 1.0,
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1F3A),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: _getLevelBorderColor(progress),
-              width: 2,
-            ),
-          ),
+        child: LiquidGlassCard(
+          padding: const EdgeInsets.all(12),
+          borderRadius: 16,
+          accentColor: borderColor != Colors.transparent
+              ? borderColor
+              : const Color(0xFF00D4FF),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -181,45 +185,45 @@ class _LevelSelectScreenState extends State<LevelSelectScreen>
                 const Icon(
                   Icons.lock,
                   color: Colors.white54,
-                  size: 40,
+                  size: 36,
                 )
               else ...[
                 Text(
                   '${level.levelNumber}',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 32,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 if (progress != null && progress.completed)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       3,
-                      (index) => Icon(
-                        index < progress.stars
-                            ? Icons.star
-                            : Icons.star_border,
-                        color: const Color(0xFFFFBE0B),
-                        size: 20,
+                      (index) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 1),
+                        child: Icon(
+                          index < progress.stars
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: const Color(0xFFFFBE0B),
+                          size: 18,
+                        ),
                       ),
                     ),
                   ),
               ],
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  level.name,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
+              const SizedBox(height: 6),
+              Text(
+                level.name,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11,
                 ),
               ),
             ],
