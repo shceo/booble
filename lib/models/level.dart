@@ -134,8 +134,7 @@ class Level {
     required this.chapterNumber,
   });
 
-  List<LaserSource> get sources =>
-      elements.whereType<LaserSource>().toList();
+  List<LaserSource> get sources => elements.whereType<LaserSource>().toList();
 
   List<Target> get targets => elements.whereType<Target>().toList();
 
@@ -191,7 +190,9 @@ class Level {
       baseJson['color'] = element.color.index;
     } else if (element is Target) {
       baseJson['id'] = element.id;
-      baseJson['requiredColor'] = element.requiredColor?.index;
+      if (element.requiredColor != null) {
+        baseJson['requiredColor'] = element.requiredColor!.index;
+      }
     } else if (element is Splitter) {
       baseJson['direction'] = element.direction.index;
     } else if (element is Portal) {
